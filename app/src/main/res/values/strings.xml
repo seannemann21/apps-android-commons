@@ -102,7 +102,7 @@
   <string name="preference_license">Default License</string>
   <string name="use_previous">Use previous title/description</string>
   <string name="allow_gps">Automatically get current location</string>
-  <string name="allow_gps_summary">Retrieve current location to offer category suggestions if image is not geotagged</string>
+  <string name="allow_gps_summary">Retrieves current location if image is not geotagged, and geotags image with it. Warning: This will reveal your current location.</string>
   <string name="preference_theme">Night mode</string>
   <string name="preference_theme_summary">Use dark theme</string>
   <string name="license_name_cc_by_sa_four"> Attribution-ShareAlike 4.0</string>
@@ -284,6 +284,8 @@
   <string name="error_fetching_nearby_places">Error fetching nearby places.</string>
   <string name="block_notification">You are blocked from editing Commons</string>
 
+  <string name="successful_wikidata_edit">Image successfully added to %1$s on Wikidata!</string>
+  <string name="wikidata_edit_failure">Failed to update corresponding wiki data entity!</string>
   <string name="menu_set_wallpaper">Set wallpaper</string>
   <string name="wallpaper_set_successfully">Wallpaper set successfully!</string>
 </resources>
