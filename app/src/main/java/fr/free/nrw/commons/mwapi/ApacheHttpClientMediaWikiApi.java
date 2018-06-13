@@ -743,6 +743,11 @@ public class ApacheHttpClientMediaWikiApi implements MediaWikiApi {
         return isUserBlocked(wikidataApi);
     }
 
+    /**
+     * Checks to see if a user is blocked from making edits using a particular api
+     * @param apiInQuestion The api to check
+     * @return Whether or not the user can make edits using a particular api
+     */
     private boolean isUserBlocked(MWApi apiInQuestion)
     {
         boolean userBlocked = false;
