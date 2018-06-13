@@ -64,7 +64,7 @@ public abstract class AuthenticatedActivity extends NavigationBaseActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(result -> result)
                 .subscribe(result -> {
-                            ViewUtil.showSnackbar(findViewById(android.R.id.content), R.string.block_notification);
+                            ViewUtil.showSnackbar(findViewById(android.R.id.content), R.string.commons_block_notification);
                         }
                 );
     }
