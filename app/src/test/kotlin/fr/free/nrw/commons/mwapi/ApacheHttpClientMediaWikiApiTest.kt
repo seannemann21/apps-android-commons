@@ -306,6 +306,86 @@ class ApacheHttpClientMediaWikiApiTest {
         assertFalse(result)
     }
 
+    @Test
+    fun isUserBlockedFromWikidataForInfinitelyBlockedUser() {
+        wikidataServer.enqueue(MockResponse().setBody("<?xml version=\"1.0\"?><api><query><userinfo id=\"1000\" name=\"testusername\" blockid=\"3000\" blockedby=\"blockerusername\" blockedbyid=\"1001\" blockreason=\"testing\" blockedtimestamp=\"2018-05-24T15:32:09Z\" blockexpiry=\"infinite\"></userinfo></query></api>"))
+
+        val result = testObject.isUserBlockedFromWikidata();
+
+        assertBasicRequestParameters(wikidataServer, "GET").let { userBlockedRequest ->
+            parseQueryParams(userBlockedRequest).let { body ->
+                assertEquals("xml", body["format"])
+                assertEquals("query", body["action"])
+                assertEquals("userinfo", body["meta"])
+                assertEquals("blockinfo", body["uiprop"])
+            }
+        }
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun isUserBlockedFromWikidataForTimeBlockedUser() {
+        val currentDate = Date()
+        val expiredDate = Date(currentDate.time + 10000)
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
+        wikidataServer.enqueue(MockResponse().setBody("<?xml version=\"1.0\"?><api><query><userinfo id=\"1000\" name=\"testusername\" blockid=\"3000\" blockedby=\"blockerusername\" blockedbyid=\"1001\" blockreason=\"testing\" blockedtimestamp=\"2018-05-24T15:32:09Z\" blockexpiry=\"" + dateFormat.format(expiredDate) + "\"></userinfo></query></api>"))
+
+        val result = testObject.isUserBlockedFromWikidata();
+
+        assertBasicRequestParameters(wikidataServer, "GET").let { userBlockedRequest ->
+            parseQueryParams(userBlockedRequest).let { body ->
+                assertEquals("xml", body["format"])
+                assertEquals("query", body["action"])
+                assertEquals("userinfo", body["meta"])
+                assertEquals("blockinfo", body["uiprop"])
+            }
+        }
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun isUserBlockedFromWikidataForExpiredBlockedUser() {
+        val currentDate = Date()
+        val expiredDate = Date(currentDate.time - 10000)
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
+        wikidataServer.enqueue(MockResponse().setBody("<?xml version=\"1.0\"?><api><query><userinfo id=\"1000\" name=\"testusername\" blockid=\"3000\" blockedby=\"blockerusername\" blockedbyid=\"1001\" blockreason=\"testing\" blockedtimestamp=\"2018-05-24T15:32:09Z\" blockexpiry=\"" + dateFormat.format(expiredDate) + "\"></userinfo></query></api>"))
+
+        val result = testObject.isUserBlockedFromWikidata();
+
+        assertBasicRequestParameters(wikidataServer, "GET").let { userBlockedRequest ->
+            parseQueryParams(userBlockedRequest).let { body ->
+                assertEquals("xml", body["format"])
+                assertEquals("query", body["action"])
+                assertEquals("userinfo", body["meta"])
+                assertEquals("blockinfo", body["uiprop"])
+            }
+        }
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun isUserBlockedFromWikidataForNotBlockedUser() {
+        wikidataServer.enqueue(MockResponse().setBody("<?xml version=\"1.0\"?><api><query><userinfo id=\"1000\" name=\"testusername\"></userinfo></query></api>"))
+
+        val result = testObject.isUserBlockedFromWikidata();
+
+        assertBasicRequestParameters(wikidataServer, "GET").let { userBlockedRequest ->
+            parseQueryParams(userBlockedRequest).let { body ->
+                assertEquals("xml", body["format"])
+                assertEquals("query", body["action"])
+                assertEquals("userinfo", body["meta"])
+                assertEquals("blockinfo", body["uiprop"])
+            }
+        }
+
+        assertFalse(result)
+    }
+
     private fun assertBasicRequestParameters(server: MockWebServer, method: String): RecordedRequest = server.takeRequest().let {
         assertEquals("/", it.requestUrl.encodedPath())
         assertEquals(method, it.method)
