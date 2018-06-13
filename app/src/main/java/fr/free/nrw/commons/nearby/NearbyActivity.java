@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import fr.free.nrw.commons.mwapi.MediaWikiApi;
 import io.reactivex.functions.Consumer;
 import java.io.IOException;
 import java.net.ConnectException;
@@ -83,6 +84,8 @@ public class NearbyActivity extends NavigationBaseActivity implements LocationUp
     @Inject
     NearbyController nearbyController;
     @Inject WikidataEditListener wikidataEditListener;
+    @Inject
+    MediaWikiApi mediaWikiApi;
 
     @Inject
     @Named("application_preferences") SharedPreferences applicationPrefs;
@@ -114,6 +117,7 @@ public class NearbyActivity extends NavigationBaseActivity implements LocationUp
         setContentView(R.layout.activity_nearby);
         ButterKnife.bind(this);
         resumeFragment();
+        showBlockStatus();
         bundle = new Bundle();
 
         initBottomSheetBehaviour();
@@ -353,6 +357,22 @@ public class NearbyActivity extends NavigationBaseActivity implements LocationUp
         lockNearbyView = false;
         checkGps();
         addNetworkBroadcastReceiver();
+    }
+
+    /**
+     * Makes API call to check if user is blocked from Wikidata. If the user is blocked, a snackbar
+     * is created to notify the user
+     */
+    protected void showBlockStatus()
+    {
+        Observable.fromCallable(() -> mediaWikiApi.isUserBlockedFromWikidata())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .filter(result -> result)
+                .subscribe(result -> {
+                            ViewUtil.showSnackbar(findViewById(android.R.id.content), R.string.wikidata_block_notification);
+                        }
+                );
     }
 
     @Override

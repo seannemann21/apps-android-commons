@@ -87,6 +87,8 @@ public interface MediaWikiApi {
 
     boolean isUserBlockedFromCommons();
 
+    public boolean isUserBlockedFromWikidata();
+
     interface ProgressListener {
         void onProgress(long transferred, long total);
     }
